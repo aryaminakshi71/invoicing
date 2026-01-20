@@ -1,0 +1,13 @@
+{
+  "name": "@invoicing/logger",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@invoicing/tsconfig": "workspace:*",
+    "@types/node": "^22.19.2",
+    "typescript": "^5.9.3"
+  }
+}

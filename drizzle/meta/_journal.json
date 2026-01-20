@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1768230042330,
+      "tag": "0000_lean_cassandra_nova",
+      "breakpoints": true
+    }
+  ]
+}

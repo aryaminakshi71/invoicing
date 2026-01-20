@@ -1,0 +1,49 @@
+{
+  "name": "@invoicing/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./app": {
+      "types": "./dist/app.d.ts",
+      "import": "./src/app.ts",
+      "default": "./src/app.ts"
+    },
+    "./router": {
+      "types": "./dist/router.d.ts",
+      "import": "./src/router.ts",
+      "default": "./src/router.ts"
+    },
+    "./auth": {
+      "types": "./dist/lib/auth.d.ts",
+      "import": "./src/lib/auth.ts",
+      "default": "./src/lib/auth.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "dev": "tsx watch src/dev.ts"
+  },
+  "dependencies": {
+    "@invoicing/env": "workspace:*",
+    "@invoicing/logger": "workspace:*",
+    "@invoicing/shared": "workspace:*",
+    "@invoicing/storage": "workspace:*",
+    "@hono/node-server": "^1.13.0",
+    "@orpc/openapi": "^1.11.2",
+    "@orpc/server": "^1.11.2",
+    "@orpc/zod": "^1.11.2",
+    "@vercel/functions": "^3.3.4",
+    "better-auth": "^1.4.12",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.7.10",
+    "nanoid": "^5.1.6",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@invoicing/tsconfig": "workspace:*",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

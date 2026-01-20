@@ -1,0 +1,43 @@
+{
+  "name": "@invoicing/storage",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts",
+      "types": "./dist/index.d.ts"
+    },
+    "./db": {
+      "default": "./src/db/index.ts",
+      "types": "./dist/db/index.d.ts"
+    },
+    "./db/schema": {
+      "default": "./src/db/schema/index.ts",
+      "types": "./dist/db/schema/index.d.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/seed.ts"
+  },
+  "dependencies": {
+    "@invoicing/env": "workspace:*",
+    "@neondatabase/serverless": "^0.10.0",
+    "drizzle-orm": "^0.45.1",
+    "drizzle-zod": "^0.8.3",
+    "nanoid": "^5.1.6",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@invoicing/tsconfig": "workspace:*",
+    "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
