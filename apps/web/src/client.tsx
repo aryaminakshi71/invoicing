@@ -1,43 +1,38 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { queryClient } from "./lib/query";
-import { routeTree } from "./routes/routeTree.gen";
+/**
+ * Client-side entry point for TanStack Start
+ */
 
-// Create router instance
-const router = createRouter({
-  routeTree,
-  context: {
-    queryClient,
+import { startClient, createRouter } from "@tanstack/react-start";
+import { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { routeTree } from "./routes/routeTree.gen";
+import { getDefaultQueryClientOptions } from "@tanstack/react-query";
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      ...getDefaultQueryClientOptions(),
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
   },
 });
 
-// Register router for type safety
+function getRouter() {
+  return createTanStackRouter({
+    routeTree,
+    scrollRestoration: true,
+    context: {
+      queryClient,
+    },
+  });
+}
+
 declare module "@tanstack/react-router" {
   interface Register {
-    router: typeof router;
+    router: ReturnType<typeof getRouter>;
   }
 }
 
-const rootElement = document.getElementById("root");
-
-if (!rootElement) {
-  throw new Error("Root element not found");
-}
-
-const root = createRoot(rootElement);
-
-import { ErrorBoundary } from "./components/ErrorBoundary";
-
-root.render(
-  <StrictMode>
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </ErrorBoundary>
-  </StrictMode>
-);
+startClient(getRouter());

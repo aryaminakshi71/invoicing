@@ -1,18 +1,26 @@
+/**
+ * oRPC Client Setup
+ *
+ * Creates a type-safe client for calling the API.
+ * Uses @orpc/tanstack-query for React Query integration.
+ */
+
 import { createORPCClient } from "@orpc/client";
+import { RPCLink } from "@orpc/client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import { useQuery as useTanStackQuery, useMutation as useTanStackMutation, useQueryClient as useTanStackQueryClient } from "@tanstack/react-query";
+import type { RouterClient } from "@orpc/server";
 import type { AppRouter } from "@invoicing/api/router";
 
 /**
- * oRPC client for making type-safe API calls
+ * Create the oRPC fetch link
  */
-const baseURL = import.meta.env.VITE_PUBLIC_SITE_URL || "http://localhost:5173";
-
-// @ts-expect-error - oRPC type system has limitations with nested router structures
-// The runtime behavior is correct, but TypeScript can't infer the nested client type
-export const orpcClient = createORPCClient<AppRouter>({
-  baseURL,
-  prefix: "/api/rpc",
+const link = new RPCLink({
+  url: "/api/rpc",
+  fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+    fetch(input, {
+      ...init,
+      credentials: "include",
+    }),
   headers: () => {
     const headers: Record<string, string> = {};
     
@@ -25,48 +33,20 @@ export const orpcClient = createORPCClient<AppRouter>({
 });
 
 /**
- * TanStack Query integration for oRPC
- * Provides query/mutation options
+ * Type-safe oRPC client
  */
-// @ts-expect-error - Same type limitation as above
-export const orpc = createTanstackQueryUtils(orpcClient);
+export const api: RouterClient<AppRouter> = createORPCClient(link);
 
 /**
- * Compatibility hooks for existing route components
- * Wraps the new oRPC API to match the expected hook interface
+ * TanStack Query integration for oRPC
+ * Provides queryOptions/mutationOptions utilities
+ *
+ * Usage:
+ * ```tsx
+ * import { useQuery, useMutation } from "@tanstack/react-query";
+ *
+ * const { data, isLoading } = useQuery(orpc.dashboard.metrics.queryOptions());
+ * const createInvoice = useMutation(orpc.invoices.create.mutationOptions());
+ * ```
  */
-export function useQuery<T = any>(options: { procedure: string; input?: any }) {
-  // Parse procedure path (e.g., "tickets.list" -> ["tickets", "list"])
-  const [router, ...procedure] = options.procedure.split(".");
-  
-  // Navigate to the procedure in the router
-  let procedureRef: any = orpc;
-  for (const part of [router, ...procedure]) {
-    procedureRef = procedureRef?.[part];
-  }
-  
-  if (!procedureRef?.queryOptions) {
-    throw new Error(`Procedure ${options.procedure} not found or does not support queries`);
-  }
-  
-  return useTanStackQuery(procedureRef.queryOptions(options.input || {}));
-}
-
-export function useMutation<T = any>(options: { procedure: string }) {
-  // Parse procedure path
-  const [router, ...procedure] = options.procedure.split(".");
-  
-  // Navigate to the procedure in the router
-  let procedureRef: any = orpc;
-  for (const part of [router, ...procedure]) {
-    procedureRef = procedureRef?.[part];
-  }
-  
-  if (!procedureRef?.mutationOptions) {
-    throw new Error(`Procedure ${options.procedure} not found or does not support mutations`);
-  }
-  
-  return useTanStackMutation(procedureRef.mutationOptions());
-}
-
-export const useQueryClient = useTanStackQueryClient;
+export const orpc = createTanstackQueryUtils(api);
