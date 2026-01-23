@@ -15,6 +15,10 @@
     "./db/schema": {
       "default": "./src/db/schema/index.ts",
       "types": "./dist/db/schema/index.d.ts"
+    },
+    "./redis": {
+      "default": "./src/redis/index.ts",
+      "types": "./dist/redis/index.d.ts"
     }
   },
   "scripts": {
@@ -29,6 +33,7 @@
   "dependencies": {
     "@invoicing/env": "workspace:*",
     "@neondatabase/serverless": "^0.10.0",
+    "@upstash/redis": "^1.36.1",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
     "nanoid": "^5.1.6",
