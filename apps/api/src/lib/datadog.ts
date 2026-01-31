@@ -1,17 +1,39 @@
 /**
  * Datadog APM Integration
- * 
+ *
  * Provides application performance monitoring with Datadog.
  * Gracefully degrades if DATADOG_API_KEY is not configured.
  */
 
-import * as tracer from "dd-trace";
+const isCloudflareRuntime =
+  typeof navigator !== "undefined" && navigator.userAgent === "Cloudflare-Workers";
+const hasProcessEnv = typeof process !== "undefined" && typeof process.env !== "undefined";
+const processEnv = hasProcessEnv ? process.env : undefined;
 
-const isConfigured = !!process.env.DATADOG_API_KEY;
+const isConfigured = !isCloudflareRuntime && !!processEnv?.DATADOG_API_KEY;
 
-if (!isConfigured) {
+if (!isConfigured && !isCloudflareRuntime) {
   console.warn("DATADOG_API_KEY not set - APM disabled");
 }
+
+type Tracer = typeof import("dd-trace");
+
+let tracerModule: Tracer | null = null;
+let tracerPromise: Promise<Tracer> | null = null;
+
+const loadTracer = async (): Promise<Tracer> => {
+  if (!tracerPromise) {
+    tracerPromise = (async () => {
+      const resolved = (await import("dd-trace")) as unknown;
+      const tracer =
+        (resolved as { default?: Tracer }).default ?? (resolved as Tracer);
+      return tracer;
+    })();
+  }
+
+  tracerModule = await tracerPromise;
+  return tracerModule;
+};
 
 /**
  * Initialize Datadog APM
@@ -20,23 +42,22 @@ if (!isConfigured) {
 export function initDatadog() {
   if (!isConfigured) return;
 
-  tracer.init({
-    service: process.env.DATADOG_SERVICE_NAME || "invoicing-api",
-    env: process.env.DATADOG_ENV || process.env.NODE_ENV || "development",
-    version: process.env.DATADOG_VERSION || "1.0.0",
-    logInjection: true,
-    runtimeMetrics: true,
-    profiling: true,
-    appsec: true,
-    plugins: {
-      http: {
-        enabled: true,
-        blocklist: ["/health", "/metrics"],
-      },
-      fetch: {
-        enabled: true,
-      },
-    },
+  void loadTracer().then((tracer) => {
+    tracer.init({
+      service: processEnv?.DATADOG_SERVICE_NAME || "invoicing-api",
+      env: processEnv?.DATADOG_ENV || processEnv?.NODE_ENV || "development",
+      version: processEnv?.DATADOG_VERSION || "1.0.0",
+      logInjection: true,
+      runtimeMetrics: true,
+      profiling: true,
+      appsec: true,
+    });
+
+    tracer.use("http", {
+      enabled: true,
+      blocklist: ["/health", "/metrics"],
+    });
+    tracer.use("fetch", { enabled: true });
   });
 }
 
@@ -48,27 +69,33 @@ export function createSpan<T>(
   operation: string,
   callback: () => T | Promise<T>
 ): T | Promise<T> {
-  if (!isConfigured) {
+  if (!isConfigured || !tracerModule) {
     return callback();
   }
 
-  return tracer.trace(name, { type: operation }, callback);
+  return tracerModule.trace(name, { type: operation }, callback);
 }
 
 /**
  * Add tags to current span
  */
 export function addTags(tags: Record<string, string | number | boolean>): void {
-  if (!isConfigured) return;
-  tracer.use("http").addTags(tags);
+  if (!isConfigured || !tracerModule) return;
+  const span = tracerModule.scope().active();
+  if (!span) return;
+  Object.entries(tags).forEach(([key, value]) => {
+    span.setTag(key, value);
+  });
 }
 
 /**
  * Set error on current span
  */
 export function setError(error: Error): void {
-  if (!isConfigured) return;
-  tracer.use("http").setError(error);
+  if (!isConfigured || !tracerModule) return;
+  const span = tracerModule.scope().active();
+  if (!span) return;
+  span.setTag("error", error);
 }
 
-export { tracer };
+export { tracerModule as tracer };

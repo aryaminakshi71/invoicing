@@ -8,7 +8,6 @@
  */
 
 /// <reference types="@cloudflare/workers-types" />
-import { env as cfEnv } from "cloudflare:workers";
 import { z } from "zod";
 import { clientSchema } from "./client.js";
 
@@ -87,4 +86,17 @@ export type ServerEnv = z.infer<typeof serverSchema>;
  * Note: Cloudflare bindings (KV, R2, Hyperdrive) are accessed separately
  * via Hono context (c.env.*), not through this module.
  */
-export const env: ServerEnv = serverSchema.parse(cfEnv);
+const isCloudflareRuntime =
+  typeof navigator !== "undefined" && navigator.userAgent === "Cloudflare-Workers";
+const hasProcessEnv =
+  typeof process !== "undefined" &&
+  typeof process.versions !== "undefined" &&
+  typeof process.versions.node !== "undefined";
+
+const runtimeEnv = isCloudflareRuntime
+  ? (await import("cloudflare:workers")).env
+  : hasProcessEnv
+    ? process.env
+    : {};
+
+export const env: ServerEnv = serverSchema.parse(runtimeEnv);

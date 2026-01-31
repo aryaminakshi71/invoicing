@@ -1,37 +1,56 @@
 /**
  * Sentry Error Tracking
- * 
+ *
  * Provides error tracking and performance monitoring.
  * Gracefully degrades if SENTRY_DSN is not configured.
  */
 
-import * as Sentry from "@sentry/node";
+const isCloudflareRuntime =
+  typeof navigator !== "undefined" && navigator.userAgent === "Cloudflare-Workers";
+const hasProcessEnv = typeof process !== "undefined" && typeof process.env !== "undefined";
+const processEnv = hasProcessEnv ? process.env : undefined;
 
-const isConfigured = !!process.env.SENTRY_DSN;
+const isConfigured = !isCloudflareRuntime && !!processEnv?.SENTRY_DSN;
 
-if (!isConfigured) {
+if (!isConfigured && !isCloudflareRuntime) {
   console.warn("SENTRY_DSN not set - Error tracking disabled");
 }
+
+type SentryModule = typeof import("@sentry/node");
+
+let sentryModule: SentryModule | null = null;
+let sentryPromise: Promise<SentryModule> | null = null;
+
+const loadSentry = async (): Promise<SentryModule> => {
+  if (!sentryPromise) {
+    sentryPromise = import("@sentry/node");
+  }
+
+  sentryModule = await sentryPromise;
+  return sentryModule;
+};
 
 export function initSentry() {
   if (!isConfigured) return;
 
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || "development",
-    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
-    profilesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
-    integrations: [
-      Sentry.httpIntegration(),
-      Sentry.nativeNodeFetchIntegration(),
-    ],
-    beforeSend(event) {
-      if (process.env.NODE_ENV === "development" && !process.env.SENTRY_DEBUG) {
-        console.log("[Sentry] Would send event:", event.message || event.exception);
-        return null;
-      }
-      return event;
-    },
+  void loadSentry().then((Sentry) => {
+    Sentry.init({
+      dsn: processEnv?.SENTRY_DSN,
+      environment: processEnv?.SENTRY_ENVIRONMENT || processEnv?.NODE_ENV || "development",
+      tracesSampleRate: processEnv?.NODE_ENV === "production" ? 0.1 : 1.0,
+      profilesSampleRate: processEnv?.NODE_ENV === "production" ? 0.1 : 1.0,
+      integrations: [
+        Sentry.httpIntegration(),
+        Sentry.nativeNodeFetchIntegration(),
+      ],
+      beforeSend(event) {
+        if (processEnv?.NODE_ENV === "development" && !processEnv?.SENTRY_DEBUG) {
+          console.log("[Sentry] Would send event:", event.message || event.exception);
+          return null;
+        }
+        return event;
+      },
+    });
   });
 }
 
@@ -48,15 +67,17 @@ export function captureException(
     return;
   }
 
-  Sentry.withScope((scope) => {
-    if (context?.user) scope.setUser(context.user);
-    if (context?.tags) {
-      Object.entries(context.tags).forEach(([key, value]) => scope.setTag(key, value));
-    }
-    if (context?.extra) {
-      Object.entries(context.extra).forEach(([key, value]) => scope.setExtra(key, value));
-    }
-    Sentry.captureException(error);
+  void loadSentry().then((Sentry) => {
+    Sentry.withScope((scope) => {
+      if (context?.user) scope.setUser(context.user);
+      if (context?.tags) {
+        Object.entries(context.tags).forEach(([key, value]) => scope.setTag(key, value));
+      }
+      if (context?.extra) {
+        Object.entries(context.extra).forEach(([key, value]) => scope.setExtra(key, value));
+      }
+      Sentry.captureException(error);
+    });
   });
 }
 
@@ -74,27 +95,32 @@ export function captureMessage(
     return;
   }
 
-  Sentry.withScope((scope) => {
-    scope.setLevel(level);
-    if (context?.user) scope.setUser(context.user);
-    if (context?.tags) {
-      Object.entries(context.tags).forEach(([key, value]) => scope.setTag(key, value));
-    }
-    if (context?.extra) {
-      Object.entries(context.extra).forEach(([key, value]) => scope.setExtra(key, value));
-    }
-    Sentry.captureMessage(message);
+  void loadSentry().then((Sentry) => {
+    Sentry.withScope((scope) => {
+      scope.setLevel(level);
+      if (context?.user) scope.setUser(context.user);
+      if (context?.tags) {
+        Object.entries(context.tags).forEach(([key, value]) => scope.setTag(key, value));
+      }
+      if (context?.extra) {
+        Object.entries(context.extra).forEach(([key, value]) => scope.setExtra(key, value));
+      }
+      Sentry.captureMessage(message);
+    });
   });
 }
 
 export function setUser(user: { id: string; email?: string; name?: string } | null) {
   if (!isConfigured) return;
-  Sentry.setUser(user);
+  void loadSentry().then((Sentry) => {
+    Sentry.setUser(user);
+  });
 }
 
 export async function flush(timeout = 2000) {
   if (!isConfigured) return;
+  const Sentry = await loadSentry();
   await Sentry.flush(timeout);
 }
 
-export { Sentry };
+export { sentryModule as Sentry };
