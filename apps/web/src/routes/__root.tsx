@@ -11,6 +11,8 @@ import { queryClient } from "../lib/query";
 import { PostHogProvider } from "../components/providers/posthog-provider";
 import { ErrorPage, NotFoundPage } from "../components/error";
 import { generateOrganizationSchema, generateWebSiteSchema, getInvoicingOrganizationSchema } from "../lib/structured-data";
+import { registerServiceWorker } from "../lib/service-worker";
+import { useEffect } from "react";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -38,6 +40,11 @@ export const Route = createRootRoute({
 });
 
 function RootDocument() {
+  // Register service worker for offline support
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   const organizationSchema = generateOrganizationSchema(getInvoicingOrganizationSchema())
   const websiteSchema = generateWebSiteSchema({
     name: 'Invoicing Platform',

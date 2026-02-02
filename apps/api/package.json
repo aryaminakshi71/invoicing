@@ -23,7 +23,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "dev": "wrangler dev --local --port 3001",
+    "dev": "wrangler dev --local --port 3013",
     "dev:node": "tsx watch src/dev.ts"
   },
   "dependencies": {
@@ -32,9 +32,9 @@
     "@invoicing/logger": "workspace:*",
     "@invoicing/shared": "workspace:*",
     "@invoicing/storage": "workspace:*",
-    "@orpc/openapi": "^1.11.2",
-    "@orpc/server": "^1.11.2",
-    "@orpc/zod": "^1.11.2",
+    "@orpc/openapi": "^1.13.4",
+    "@orpc/server": "^1.13.4",
+    "@orpc/zod": "^1.13.4",
     "@sentry/node": "^10.38.0",
     "@upstash/ratelimit": "^2.0.7",
     "@vercel/functions": "^3.3.4",
