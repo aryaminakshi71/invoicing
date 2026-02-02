@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -11,19 +12,12 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { ComponentLoadingSkeleton } from "@/components/lazy-loading";
+
+// Lazy load chart sections as separate components
+const CashFlowChart = lazy(() => import("@/components/charts/cash-flow-chart").then(m => ({ default: m.CashFlowChart })));
+const SpendingMixChart = lazy(() => import("@/components/charts/spending-mix-chart").then(m => ({ default: m.SpendingMixChart })));
+const RevenueMixChart = lazy(() => import("@/components/charts/revenue-mix-chart").then(m => ({ default: m.RevenueMixChart })));
 
 export const Route = createFileRoute("/app/dashboard")({
   component: DashboardPage,
@@ -214,49 +208,13 @@ function DashboardPage() {
               </div>
             </div>
             <div className="mt-6 h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={cashflowData} margin={{ left: 10, right: 10 }}>
-                  <defs>
-                    <linearGradient id="incomeFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="expenseFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#fb7185" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#fb7185" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#6b7280" }} />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#6b7280" }}
-                    tickFormatter={(value) => compactCurrencyFormatter.format(value)}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "12px",
-                    }}
-                    formatter={(value: number) => currencyFormatter.format(value)}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="income"
-                    stroke="#22c55e"
-                    strokeWidth={2}
-                    fill="url(#incomeFill)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="expenses"
-                    stroke="#fb7185"
-                    strokeWidth={2}
-                    fill="url(#expenseFill)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<ComponentLoadingSkeleton />}>
+                <CashFlowChart
+                  data={cashflowData}
+                  currencyFormatter={currencyFormatter}
+                  compactCurrencyFormatter={compactCurrencyFormatter}
+                />
+              </Suspense>
             </div>
           </div>
 
@@ -364,23 +322,12 @@ function DashboardPage() {
               <Landmark className="h-5 w-5 text-emerald-600" />
             </div>
             <div className="mt-6 h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={spendingCategories} dataKey="value" innerRadius={55} outerRadius={90} paddingAngle={3}>
-                    {spendingCategories.map((entry) => (
-                      <Cell key={entry.name} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "12px",
-                    }}
-                    formatter={(value: number) => currencyFormatter.format(value)}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<ComponentLoadingSkeleton />}>
+                <SpendingMixChart
+                  data={spendingCategories}
+                  currencyFormatter={currencyFormatter}
+                />
+              </Suspense>
             </div>
             <div className="mt-4 space-y-2">
               {spendingCategories.map((category) => (
@@ -520,33 +467,18 @@ function DashboardPage() {
               <TrendingUp className="h-5 w-5 text-emerald-600" />
             </div>
             <div className="mt-6 h-60">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
+              <Suspense fallback={<ComponentLoadingSkeleton />}>
+                <RevenueMixChart
                   data={[
                     { name: "Retainers", value: 42800 },
                     { name: "Projects", value: 31200 },
                     { name: "Usage", value: 18400 },
                     { name: "Support", value: 8600 },
                   ]}
-                >
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#6b7280" }} />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#6b7280" }}
-                    tickFormatter={(value) => compactCurrencyFormatter.format(value)}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "12px",
-                    }}
-                    formatter={(value: number) => currencyFormatter.format(value)}
-                  />
-                  <Bar dataKey="value" fill="#22c55e" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+                  currencyFormatter={currencyFormatter}
+                  compactCurrencyFormatter={compactCurrencyFormatter}
+                />
+              </Suspense>
             </div>
             <p className="mt-4 text-xs text-gray-500">
               67% of revenue is recurring, improving forecast stability.
