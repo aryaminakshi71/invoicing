@@ -43,6 +43,8 @@ function RootDocument() {
   // Register service worker for offline support
   useEffect(() => {
     registerServiceWorker();
+    // Add skip link for accessibility
+    addSkipLink("main-content", "Skip to main content");
   }, []);
 
   const organizationSchema = generateOrganizationSchema(getInvoicingOrganizationSchema())
@@ -78,7 +80,7 @@ function RootDocument() {
         </a>
         <PostHogProvider>
           <QueryClientProvider client={queryClient}>
-            <main id="main-content">
+            <main id="main-content" tabIndex={-1}>
               <Outlet />
             </main>
             <Toaster position="top-right" />

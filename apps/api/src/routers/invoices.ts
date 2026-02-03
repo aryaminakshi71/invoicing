@@ -6,6 +6,7 @@
 
 import { z } from "zod";
 import { orgAuthed, getDb, schema } from "../procedures";
+import { trackQuery } from "../lib/db-performance";
 
 export const invoicesRouter = {
   /**
@@ -33,9 +34,13 @@ export const invoicesRouter = {
     .handler(async ({ context, input }) => {
       const db = getDb(context);
       // TODO: Implement invoice listing logic
-      return {
-        invoices: [],
-        total: 0,
-      };
+      const result = await trackQuery('listInvoices', async () => {
+        // Placeholder for actual implementation
+        return {
+          invoices: [],
+          total: 0,
+        };
+      });
+      return result;
     }),
 };
