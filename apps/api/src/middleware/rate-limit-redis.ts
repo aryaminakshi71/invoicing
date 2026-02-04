@@ -62,19 +62,28 @@ export function rateLimitRedis(options: Partial<RateLimitOptions> = {}) {
     
     if (opts.limiterType && rateLimiters[opts.limiterType]) {
       const limiter = rateLimiters[opts.limiterType]!;
-      const result = await limiter.limit(key);
-      
-      if (!result.success) {
-        const retryAfter = Math.ceil((result.reset - Date.now()) / 1000);
-        throw new RateLimitError(
-          `Rate limit exceeded. Please try again in ${retryAfter} seconds.`,
-          retryAfter,
-        );
+      try {
+        const result = await limiter.limit(key);
+        
+        if (!result.success) {
+          const retryAfter = Math.ceil((result.reset - Date.now()) / 1000);
+          throw new RateLimitError(
+            `Rate limit exceeded. Please try again in ${retryAfter} seconds.`,
+            retryAfter,
+          );
+        }
+        
+        c.header("X-RateLimit-Limit", result.limit.toString());
+        c.header("X-RateLimit-Remaining", result.remaining.toString());
+        c.header("X-RateLimit-Reset", result.reset.toString());
+      } catch (err) {
+        // Check if it's a RateLimitError - use duck typing for Workers compatibility
+        if (err && typeof err === 'object' && ('name' in err && err.name === 'RateLimitError' || 'code' in err && (err as any).code === 'RATE_LIMITED')) {
+          throw err;
+        }
+        // Fail open if Redis fails or times out (matching CRM pattern)
+        console.error("Rate limit error (fail open):", err);
       }
-      
-      c.header("X-RateLimit-Limit", result.limit.toString());
-      c.header("X-RateLimit-Remaining", result.remaining.toString());
-      c.header("X-RateLimit-Reset", result.reset.toString());
       
       await next();
       return;

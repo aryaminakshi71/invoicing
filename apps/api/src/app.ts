@@ -18,6 +18,7 @@ import { loggerMiddleware } from "./middleware/logger";
 import { initSentry } from "./lib/sentry";
 import { initDatadog } from "./lib/datadog";
 import { rateLimitRedis } from "./middleware/rate-limit-redis";
+import { setSecurityHeaders } from "./lib/security";
 import { APIError, formatErrorResponse } from "./lib/errors";
 import { captureException as sentryCaptureException } from "./lib/sentry";
 import { appRouter } from "./routers";
@@ -43,11 +44,7 @@ export function createApp() {
     setSecurityHeaders(c.res.headers);
   });
 
-  // Rate limiting middleware
-  app.use("/api/*", rateLimitRedis({ limiterType: "api" }));
-  app.use("/api/auth/*", rateLimitRedis({ limiterType: "auth" }));
-
-  // Health check (non-RPC)
+  // Health check (non-RPC) - must be before rate limiting
   app.get("/api/health", (c) => {
     return c.json({
       status: "ok",
@@ -55,6 +52,10 @@ export function createApp() {
       version: "1.0.0",
     });
   });
+
+  // Rate limiting middleware
+  app.use("/api/*", rateLimitRedis({ limiterType: "api" }));
+  app.use("/api/auth/*", rateLimitRedis({ limiterType: "auth" }));
 
   // Better Auth handler (includes Stripe webhook at /api/auth/stripe/webhook)
   app.on(["GET", "POST"], "/api/auth/*", async (c) => {
