@@ -174,13 +174,22 @@ export function createApp() {
 
   // Scalar API Documentation UI
   app.get("/api/docs", async (c) => {
-    const { Scalar } = await import("@scalar/hono-api-reference");
-    return Scalar({
-      spec: {
-        url: "/api/openapi.json",
-      },
-      theme: "purple",
-    })(c);
+    try {
+      // Dynamic import with error handling for environments where it's not available
+      const scalarModule = await import("@scalar/hono-api-reference").catch(() => null);
+      if (!scalarModule) {
+        return c.json({ error: "API documentation not available" }, 503);
+      }
+      const { Scalar } = scalarModule;
+      return Scalar({
+        spec: {
+          url: "/api/openapi.json",
+        },
+        theme: "purple",
+      })(c);
+    } catch (error) {
+      return c.json({ error: "Failed to load API documentation" }, 500);
+    }
   });
 
   return app;

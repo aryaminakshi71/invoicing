@@ -29,6 +29,13 @@ export enum ErrorCode {
   RATE_LIMITED = "RATE_LIMITED",
 }
 
+export class RateLimitError extends Error {
+  constructor(message: string, public retryAfter: number) {
+    super(message);
+    this.name = "RateLimitError";
+  }
+}
+
 export class APIError extends Error {
   constructor(
     public code: ErrorCode,

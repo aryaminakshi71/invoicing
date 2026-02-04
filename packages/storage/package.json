@@ -5,19 +5,19 @@
   "type": "module",
   "exports": {
     ".": {
-      "default": "./src/index.ts",
+      "import": "./src/index.ts",
       "types": "./dist/index.d.ts"
     },
     "./db": {
-      "default": "./src/db/index.ts",
+      "import": "./src/db/index.ts",
       "types": "./dist/db/index.d.ts"
     },
     "./db/schema": {
-      "default": "./src/db/schema/index.ts",
+      "import": "./src/db/schema/index.ts",
       "types": "./dist/db/schema/index.d.ts"
     },
     "./redis": {
-      "default": "./src/redis/index.ts",
+      "import": "./src/redis/index.ts",
       "types": "./dist/redis/index.d.ts"
     }
   },

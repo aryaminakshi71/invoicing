@@ -1,0 +1,19 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "invoicing-api",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2025-01-15",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env"
+  ],
+  "vars": {
+    "NODE_ENV": "development"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "dev": {
+    "port": 3013
+  }
+}
