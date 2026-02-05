@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileText, DollarSign, Clock, Zap, Shield, BarChart3, ArrowRight, Check, Receipt, CreditCard } from "lucide-react";
 
 const features = [
@@ -82,14 +82,9 @@ export const Route = createFileRoute("/")({
 });
 
 function LandingPage() {
-  const handleGetStarted = () => {
-    window.location.href = "/signup";
-  };
-
   const handleTryDemo = () => {
     // Set demo mode and navigate to app
     localStorage.setItem("demo_mode", "true");
-    window.location.href = "/app/dashboard";
   };
 
   return (
@@ -106,19 +101,20 @@ function LandingPage() {
             Everything you need to manage your invoicing in one place.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={handleGetStarted}
+            <Link
+              to="/signup"
               className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
             >
               Get Started Free
               <ArrowRight className="w-5 h-5" />
-            </button>
-            <button
+            </Link>
+            <Link
+              to="/app/dashboard"
               onClick={handleTryDemo}
               className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold border-2 border-green-600 hover:bg-green-50 transition-colors"
             >
               Try Demo
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -180,16 +176,16 @@ function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <button
-                onClick={handleGetStarted}
-                className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+              <Link
+                to="/signup"
+                className={`w-full py-3 rounded-lg font-semibold transition-colors block text-center ${
                   plan.popular
                     ? "bg-green-600 text-white hover:bg-green-700"
                     : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                 }`}
               >
                 Get Started
-              </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -202,12 +198,12 @@ function LandingPage() {
           <p className="text-xl mb-8 opacity-90">
             Join thousands of businesses streamlining their invoicing process
           </p>
-          <button
-            onClick={handleGetStarted}
-            className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+          <Link
+            to="/signup"
+            className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex"
           >
             Start Free Trial
-          </button>
+          </Link>
         </div>
       </div>
     </div>

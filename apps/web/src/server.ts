@@ -32,10 +32,24 @@ export default {
       return api.fetch(request, env as any, ctx);
     }
 
-    return handler.fetch(request, {
+    const response = await handler.fetch(request, {
       context: {
         cloudflare: { env, ctx },
       },
     } as Parameters<typeof handler.fetch>[1]);
+
+    const headers = new Headers(response.headers);
+    if (!headers.has("x-frame-options")) {
+      headers.set("x-frame-options", "SAMEORIGIN");
+    }
+    if (!headers.has("x-content-type-options")) {
+      headers.set("x-content-type-options", "nosniff");
+    }
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   },
 };

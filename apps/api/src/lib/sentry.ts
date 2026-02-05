@@ -11,8 +11,9 @@ const hasProcessEnv = typeof process !== "undefined" && typeof process.env !== "
 const processEnv = hasProcessEnv ? process.env : undefined;
 
 const isConfigured = !isCloudflareRuntime && !!processEnv?.SENTRY_DSN;
+const shouldWarnMissing = processEnv?.NODE_ENV === "production";
 
-if (!isConfigured && !isCloudflareRuntime) {
+if (!isConfigured && shouldWarnMissing && !isCloudflareRuntime) {
   console.warn("SENTRY_DSN not set - Error tracking disabled");
 }
 

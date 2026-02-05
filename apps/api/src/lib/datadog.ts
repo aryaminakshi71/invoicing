@@ -11,8 +11,9 @@ const hasProcessEnv = typeof process !== "undefined" && typeof process.env !== "
 const processEnv = hasProcessEnv ? process.env : undefined;
 
 const isConfigured = !isCloudflareRuntime && !!processEnv?.DATADOG_API_KEY;
+const shouldWarnMissing = processEnv?.NODE_ENV === "production";
 
-if (!isConfigured && !isCloudflareRuntime) {
+if (!isConfigured && shouldWarnMissing && !isCloudflareRuntime) {
   console.warn("DATADOG_API_KEY not set - APM disabled");
 }
 

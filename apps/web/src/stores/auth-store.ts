@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 }));
 
 // Better Auth client
-const baseURL = import.meta.env.VITE_PUBLIC_SITE_URL || "http://localhost:5173";
+const baseURL = import.meta.env.VITE_PUBLIC_SITE_URL || "http://localhost:3004";
 export const authClient = createAuthClient({
   baseURL,
 });

@@ -32,8 +32,6 @@ export function createDb(
     url = process.env.DATABASE_URL!;
   }
 
-  // Optimize Neon for Cloudflare Workers
-  neonConfig.fetchConnectionCache = true;
   
   // drizzle-orm/neon-serverless accepts connection string directly
   return drizzle(url, { schema });
