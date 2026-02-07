@@ -7,11 +7,13 @@
 
 import { createAuth } from "@invoicing/auth";
 import type { Database } from "@invoicing/storage";
+import { schema } from "@invoicing/storage";
 import type { AppEnv } from "../context";
 
 export function createAuthFromEnv(db: Database, env: AppEnv) {
   return createAuth({
     db,
+    schema: schema as unknown as Record<string, unknown>,
     kv: env.CACHE,
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.VITE_PUBLIC_SITE_URL,

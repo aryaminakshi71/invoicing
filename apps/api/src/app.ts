@@ -37,6 +37,27 @@ export function createApp() {
   app.use("*", cors({ origin: (origin) => origin, credentials: true }));
   app.use("*", requestId());
   app.use("*", loggerMiddleware);
+
+  // Polyfill Cloudflare env bindings from process.env when running in Node.js
+  app.use("*", async (c, next) => {
+    if (!c.env?.DATABASE?.connectionString) {
+      const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/invoicing_db";
+      c.env = {
+        ...c.env,
+        DATABASE: { connectionString: dbUrl },
+        BETTER_AUTH_SECRET: c.env?.BETTER_AUTH_SECRET || process.env.BETTER_AUTH_SECRET || "dev-only-secret-change-me-please-32chars",
+        VITE_PUBLIC_SITE_URL: c.env?.VITE_PUBLIC_SITE_URL || process.env.VITE_PUBLIC_SITE_URL || "http://localhost:3004",
+        NODE_ENV: c.env?.NODE_ENV || process.env.NODE_ENV || "development",
+        GOOGLE_CLIENT_ID: c.env?.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: c.env?.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET,
+        GITHUB_CLIENT_ID: c.env?.GITHUB_CLIENT_ID || process.env.GITHUB_CLIENT_ID,
+        GITHUB_CLIENT_SECRET: c.env?.GITHUB_CLIENT_SECRET || process.env.GITHUB_CLIENT_SECRET,
+        STRIPE_SECRET_KEY: c.env?.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY,
+        STRIPE_WEBHOOK_SECRET: c.env?.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET,
+      } as AppEnv;
+    }
+    await next();
+  });
   
   // Security headers middleware
   app.use("*", async (c, next) => {
@@ -59,45 +80,61 @@ export function createApp() {
 
   // Better Auth handler (includes Stripe webhook at /api/auth/stripe/webhook)
   app.on(["GET", "POST"], "/api/auth/*", async (c) => {
-    // Fallback to process.env when running without Cloudflare Workers
-    // c.env may be undefined when not running on Cloudflare (SKIP_CLOUDFLARE=true)
-    const envBindings = c.env || {};
-    const connectionString =
-      envBindings.DATABASE?.connectionString || process.env.DATABASE_URL;
+    try {
+      // Fallback to process.env when running without Cloudflare Workers
+      // c.env may be undefined when not running on Cloudflare (SKIP_CLOUDFLARE=true)
+      const envBindings = c.env || {};
+      const connectionString =
+        envBindings.DATABASE?.connectionString || process.env.DATABASE_URL;
 
-    if (!connectionString) {
-      throw new Error(
-        "DATABASE connection string not found in environment bindings or process.env.DATABASE_URL",
-      );
+      if (!connectionString) {
+        throw new Error(
+          "DATABASE connection string not found in environment bindings or process.env.DATABASE_URL",
+        );
+      }
+
+      console.log("[Auth] Creating DB with connection string:", connectionString.replace(/:[^@]+@/, ':***@'));
+
+      const db = createDb({ connectionString });
+
+      // Create minimal env object with defaults for missing bindings
+      const minimalEnv = {
+        DATABASE_URL: connectionString,
+        NODE_ENV: envBindings.NODE_ENV || process.env.NODE_ENV || "development",
+        VITE_PUBLIC_SITE_URL:
+          envBindings.VITE_PUBLIC_SITE_URL ||
+          process.env.VITE_PUBLIC_SITE_URL ||
+          "http://localhost:3004",
+        BETTER_AUTH_SECRET:
+          envBindings.BETTER_AUTH_SECRET || process.env.BETTER_AUTH_SECRET,
+        CACHE: envBindings.CACHE,
+        BUCKET: envBindings.BUCKET,
+        ASSETS: envBindings.ASSETS,
+        IMAGES: envBindings.IMAGES,
+        AI: envBindings.AI,
+        GOOGLE_CLIENT_ID: envBindings.GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: envBindings.GOOGLE_CLIENT_SECRET,
+        GITHUB_CLIENT_ID: envBindings.GITHUB_CLIENT_ID,
+        GITHUB_CLIENT_SECRET: envBindings.GITHUB_CLIENT_SECRET,
+        STRIPE_SECRET_KEY: envBindings.STRIPE_SECRET_KEY,
+        STRIPE_WEBHOOK_SECRET: envBindings.STRIPE_WEBHOOK_SECRET,
+      };
+
+      console.log("[Auth] Creating auth instance with baseURL:", minimalEnv.VITE_PUBLIC_SITE_URL);
+
+      const auth = createAuthFromEnv(db, minimalEnv as any);
+      
+      console.log("[Auth] Handling request:", c.req.method, c.req.path);
+      
+      const response = await auth.handler(c.req.raw);
+      
+      console.log("[Auth] Response status:", response.status);
+      
+      return response;
+    } catch (error) {
+      console.error("[Auth] Error in auth handler:", error);
+      return c.json({ error: "Internal authentication error", details: String(error) }, 500);
     }
-
-    const db = createDb({ connectionString });
-
-    // Create minimal env object with defaults for missing bindings
-    const minimalEnv = {
-      DATABASE_URL: connectionString,
-      NODE_ENV: envBindings.NODE_ENV || process.env.NODE_ENV || "development",
-      VITE_PUBLIC_SITE_URL:
-        envBindings.VITE_PUBLIC_SITE_URL ||
-        process.env.VITE_PUBLIC_SITE_URL ||
-        "http://localhost:5173",
-      BETTER_AUTH_SECRET:
-        envBindings.BETTER_AUTH_SECRET || process.env.BETTER_AUTH_SECRET,
-      CACHE: envBindings.CACHE,
-      BUCKET: envBindings.BUCKET,
-      ASSETS: envBindings.ASSETS,
-      IMAGES: envBindings.IMAGES,
-      AI: envBindings.AI,
-      GOOGLE_CLIENT_ID: envBindings.GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET: envBindings.GOOGLE_CLIENT_SECRET,
-      GITHUB_CLIENT_ID: envBindings.GITHUB_CLIENT_ID,
-      GITHUB_CLIENT_SECRET: envBindings.GITHUB_CLIENT_SECRET,
-      STRIPE_SECRET_KEY: envBindings.STRIPE_SECRET_KEY,
-      STRIPE_WEBHOOK_SECRET: envBindings.STRIPE_WEBHOOK_SECRET,
-    };
-
-    const auth = createAuthFromEnv(db, minimalEnv as any);
-    return auth.handler(c.req.raw);
   });
 
   // oRPC handler

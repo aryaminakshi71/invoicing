@@ -27,17 +27,17 @@ export function CashFlowChart({ data, currencyFormatter, compactCurrencyFormatte
             <stop offset="95%" stopColor="#fb7185" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#6b7280" }} />
+        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#4b5e54" }} />
         <YAxis
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#6b7280" }}
+          tick={{ fill: "#4b5e54" }}
           tickFormatter={(value) => compactCurrencyFormatter.format(value)}
         />
         <Tooltip
           contentStyle={{
             backgroundColor: "#ffffff",
-            border: "1px solid #e5e7eb",
+            border: "1px solid #d1d9d5",
             borderRadius: "12px",
           }}
           formatter={(value: number) => currencyFormatter.format(value)}

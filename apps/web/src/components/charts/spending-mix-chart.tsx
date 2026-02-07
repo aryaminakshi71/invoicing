@@ -29,7 +29,7 @@ export function SpendingMixChart({ data, currencyFormatter }: SpendingMixChartPr
         <Tooltip
           contentStyle={{
             backgroundColor: "#ffffff",
-            border: "1px solid #e5e7eb",
+            border: "1px solid #d1d9d5",
             borderRadius: "12px",
           }}
           formatter={(value: number) => currencyFormatter.format(value)}

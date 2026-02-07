@@ -13,9 +13,20 @@ import type { AppRouter } from "@invoicing/api/router";
 
 /**
  * Create the oRPC fetch link
+ * 
+ * Uses a function to determine the base URL at runtime:
+ * - In browser: uses the current origin
+ * - During SSR: uses the VITE_PUBLIC_SITE_URL env var
  */
 const link = new RPCLink({
-  url: "/api/rpc",
+  url: () => {
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}/api/rpc`;
+    }
+    // SSR fallback
+    const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL || "http://localhost:3004";
+    return `${siteUrl}/api/rpc`;
+  },
   fetch: (input: RequestInfo | URL, init?: RequestInit) =>
     fetch(input, {
       ...init,
@@ -27,6 +38,14 @@ const link = new RPCLink({
     // Add demo mode header
     const isDemo = typeof window !== "undefined" && localStorage.getItem("demo_mode") === "true";
     headers["x-demo-mode"] = isDemo ? "true" : "false";
+
+    // Add organization slug header
+    if (typeof window !== "undefined") {
+      const orgSlug = localStorage.getItem("organization_slug");
+      if (orgSlug) {
+        headers["x-organization-slug"] = orgSlug;
+      }
+    }
 
     return headers;
   },

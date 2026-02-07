@@ -47,6 +47,15 @@ export default defineConfig(({ mode }) => {
       port: Number(port),
       host: true,
       strictPort: true,
+      // Proxy /api/* to the standalone API server when running without Cloudflare
+      ...(process.env.SKIP_CLOUDFLARE === 'true' ? {
+        proxy: {
+          '/api': {
+            target: 'http://localhost:3013',
+            changeOrigin: true,
+          },
+        },
+      } : {}),
     },
     plugins: [
       viteTsConfigPaths({
@@ -61,9 +70,7 @@ export default defineConfig(({ mode }) => {
       // devtools(),
       tailwindcss(),
       tanstackStart({
-        srcDirectory: "src",
-        start: { entry: "./start.tsx" },
-        server: { entry: "./server.ts" },
+        server: { entry: "./src/server.ts" },
       }),
       viteReact(),
       // Bundle analyzer (only in production builds when ANALYZE=true)

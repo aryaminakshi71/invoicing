@@ -1,7 +1,9 @@
 import { HeadContent, Scripts, Outlet, createRootRoute } from '@tanstack/react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from 'sonner'
 import { queryClient } from '@/lib/query'
 import { NotFoundPage } from '@/components/error'
+import appCss from '@/styles.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -14,6 +16,9 @@ export const Route = createRootRoute({
         content:
           'Create professional invoices, track payments, and get paid faster with a simple invoicing platform.',
       },
+    ],
+    links: [
+      { rel: 'stylesheet', href: appCss },
     ],
   }),
   component: RootDocument,
@@ -29,6 +34,7 @@ function RootDocument() {
       <body>
         <QueryClientProvider client={queryClient}>
           <Outlet />
+          <Toaster richColors position="top-right" />
           <Scripts />
         </QueryClientProvider>
       </body>

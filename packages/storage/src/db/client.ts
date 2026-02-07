@@ -1,5 +1,6 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { neonConfig } from "@neondatabase/serverless";
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
+import { drizzle as drizzleNodePg } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "./schema/index.js";
 
 /**
@@ -10,14 +11,20 @@ export interface HyperdriveConnection {
 }
 
 /**
- * Create a database client optimized for Cloudflare Workers with Neon
+ * Detect if a connection string points to a local PostgreSQL instance
+ */
+function isLocalPostgres(url: string): boolean {
+  return url.includes("localhost") || url.includes("127.0.0.1") || url.includes("host.docker.internal");
+}
+
+/**
+ * Create a database client
  *
- * In Cloudflare Workers:
- * - Use env.DATABASE.connectionString (from Hyperdrive binding)
- * - Automatically uses Neon serverless driver optimized for edge runtime
+ * In Cloudflare Workers / Neon:
+ * - Uses Neon serverless driver (WebSocket-based)
  *
  * In local development:
- * - Use connectionString parameter or DATABASE_URL env var
+ * - Uses node-postgres (standard TCP connection)
  */
 export function createDb(
   connectionString?: string | HyperdriveConnection,
@@ -32,16 +39,21 @@ export function createDb(
     url = process.env.DATABASE_URL!;
   }
 
-  
-  // drizzle-orm/neon-serverless accepts connection string directly
-  return drizzle(url, { schema });
+  // Use node-postgres for local development, Neon serverless for production
+  if (isLocalPostgres(url)) {
+    const pool = new Pool({ connectionString: url });
+    return drizzleNodePg(pool, { schema });
+  }
+
+  // drizzle-orm/neon-serverless for Neon/Cloudflare
+  return drizzleNeon(url, { schema });
 }
 
 
 /**
- * Database client type
+ * Database client type — works with both Neon serverless and node-postgres drivers
  */
-export type Database = ReturnType<typeof createDb>;
+export type Database = ReturnType<typeof drizzleNeon<typeof schema>> | ReturnType<typeof drizzleNodePg<typeof schema>>;
 
 // Re-export schema for convenience
 export { schema };

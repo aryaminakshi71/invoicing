@@ -40,9 +40,6 @@ export function getInvoicingRoutes(): SitemapRoute[] {
   return [
     { path: '/', changefreq: 'daily', priority: 1.0 },
     { path: '/login', changefreq: 'monthly', priority: 0.5 },
-    { path: '/register', changefreq: 'monthly', priority: 0.5 },
-    { path: '/features', changefreq: 'monthly', priority: 0.7 },
-    { path: '/pricing', changefreq: 'monthly', priority: 0.8 },
-    { path: '/about', changefreq: 'monthly', priority: 0.6 },
+    { path: '/signup', changefreq: 'monthly', priority: 0.5 },
   ]
 }

@@ -5,7 +5,7 @@
  */
 
 // Auth schemas (Better Auth)
-export * from "./auth.schema.js";
+export * from "./auth.schema";
 
 // Invoicing-specific schemas
-export * from "./invoicing.schema.js";
+export * from "./invoicing.schema";

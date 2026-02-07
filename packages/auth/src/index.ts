@@ -27,6 +27,8 @@ export interface AuthConfig {
   secret: string;
   /** Base URL for the app (e.g., https://example.com) */
   baseURL: string;
+  /** Drizzle schema object for the adapter */
+  schema?: Record<string, unknown>;
   /** OAuth provider credentials */
   oauth?: {
     google?: {
@@ -51,7 +53,7 @@ export interface AuthConfig {
  * Create a Better Auth instance configured for Cloudflare Workers
  */
 export function createAuth(config: AuthConfig) {
-  const { db, kv, secret, baseURL, oauth, stripe, trustedOrigins = [] } = config;
+  const { db, kv, secret, baseURL, oauth, stripe, schema, trustedOrigins = [] } = config;
 
   // Build plugins array
   const plugins: any[] = [
@@ -87,12 +89,17 @@ export function createAuth(config: AuthConfig) {
     );
   }
 
+  // Determine if we're in local development (no HTTPS)
+  const isLocalDev = baseURL.startsWith("http://localhost") || baseURL.startsWith("http://127.0.0.1");
+
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: "pg",
-      usePlural: true,
+      usePlural: false,
+      ...(schema ? { schema } : {}),
     }),
-    secondaryStorage: createKVStorage(kv),
+    // Only use KV secondary storage when available (not in local dev without Cloudflare)
+    ...(kv ? { secondaryStorage: createKVStorage(kv) } : {}),
     secret,
     baseURL,
     basePath: "/api/auth",
@@ -141,7 +148,7 @@ export function createAuth(config: AuthConfig) {
 
     // Advanced settings
     advanced: {
-      useSecureCookies: true,
+      useSecureCookies: !isLocalDev, // Disable secure cookies for http://localhost
       cookiePrefix: "invoicing",
       database: {
         generateId: () => crypto.randomUUID(),

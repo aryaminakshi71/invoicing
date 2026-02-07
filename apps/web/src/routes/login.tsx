@@ -46,6 +46,21 @@ function LoginPage() {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("companyId");
         }
+
+        // Fetch user's organizations and persist the active one
+        try {
+          const orgs = await authClient.organization.list();
+          if (orgs.data && orgs.data.length > 0) {
+            const activeOrg = orgs.data[0];
+            await authClient.organization.setActive({
+              organizationId: activeOrg.id,
+            });
+            localStorage.setItem("organization_slug", activeOrg.slug ?? activeOrg.id);
+          }
+        } catch (orgError) {
+          console.warn("Failed to fetch organizations:", orgError);
+        }
+
         toast.success("Welcome back!");
         navigate({ to: "/app" });
       }

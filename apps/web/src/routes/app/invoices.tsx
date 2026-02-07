@@ -10,9 +10,11 @@ export const Route = createFileRoute("/app/invoices")({
 
 function InvoicesPage() {
   const { data, isLoading, error } = useQuery(
-    orpc.invoices.list.useQuery({
-      limit: 50,
-      offset: 0,
+    orpc.invoices.list.queryOptions({
+      input: {
+        limit: 50,
+        offset: 0,
+      },
     })
   );
 
@@ -23,10 +25,10 @@ function InvoicesPage() {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Invoices</h1>
       <div className="space-y-4">
-        {data?.data?.map((invoice: any) => (
+        {data?.invoices?.map((invoice: any) => (
           <div key={invoice.id} className="border p-4 rounded-lg">
             <h2 className="font-semibold">{invoice.invoiceNumber}</h2>
-            <p className="text-sm text-gray-600">{invoice.customerName} - {invoice.status}</p>
+            <p className="text-sm text-muted-foreground">{invoice.customerName} - {invoice.status}</p>
             <p className="text-sm font-medium">${invoice.total}</p>
           </div>
         ))}

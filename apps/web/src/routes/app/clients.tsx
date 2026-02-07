@@ -10,9 +10,11 @@ export const Route = createFileRoute("/app/clients")({
 
 function ClientsPage() {
   const { data, isLoading, error } = useQuery(
-    orpc.clients.list.useQuery({
-      limit: 50,
-      offset: 0,
+    orpc.clients.list.queryOptions({
+      input: {
+        limit: 50,
+        offset: 0,
+      },
     })
   );
 
@@ -23,10 +25,10 @@ function ClientsPage() {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Clients</h1>
       <div className="space-y-4">
-        {data?.data?.map((client: any) => (
+        {data?.clients?.map((client: any) => (
           <div key={client.id} className="border p-4 rounded-lg">
             <h2 className="font-semibold">{client.name}</h2>
-            <p className="text-sm text-gray-600">{client.email}</p>
+            <p className="text-sm text-muted-foreground">{client.email}</p>
           </div>
         ))}
       </div>

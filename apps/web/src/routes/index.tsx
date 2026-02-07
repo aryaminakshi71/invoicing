@@ -88,22 +88,22 @@ function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
             Invoice Management
-            <span className="text-green-600"> Made Simple</span>
+            <span className="text-primary"> Made Simple</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-muted-foreground mb-8">
             Create professional invoices, track payments, and get paid faster.
             Everything you need to manage your invoicing in one place.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/signup"
-              className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+              className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
             >
               Get Started Free
               <ArrowRight className="w-5 h-5" />
@@ -111,7 +111,7 @@ function LandingPage() {
             <Link
               to="/app/dashboard"
               onClick={handleTryDemo}
-              className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold border-2 border-green-600 hover:bg-green-50 transition-colors"
+              className="bg-card text-primary px-8 py-3 rounded-lg font-semibold border-2 border-primary hover:bg-green-50 transition-colors"
             >
               Try Demo
             </Link>
@@ -122,31 +122,31 @@ function LandingPage() {
       {/* Features Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-foreground mb-4">
             Everything You Need to Get Paid
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-muted-foreground">
             Powerful features to streamline your invoicing process
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-              <feature.icon className="w-12 h-12 text-green-600 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
+            <div key={idx} className="bg-card p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+              <feature.icon className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">{feature.title}</h3>
+              <p className="text-muted-foreground">{feature.description}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Pricing Section */}
-      <div className="container mx-auto px-4 py-20 bg-white">
+      <div className="container mx-auto px-4 py-20 bg-card">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-foreground mb-4">
             Simple, Transparent Pricing
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-muted-foreground">
             Choose the plan that works for your business
           </p>
         </div>
@@ -154,25 +154,25 @@ function LandingPage() {
           {pricingPlans.map((plan, idx) => (
             <div
               key={idx}
-              className={`bg-white p-8 rounded-xl shadow-lg border-2 ${
-                plan.popular ? "border-green-600 scale-105" : "border-gray-200"
+              className={`bg-card p-8 rounded-xl shadow-lg border-2 ${
+                plan.popular ? "border-primary scale-105" : "border-border"
               }`}
             >
               {plan.popular && (
-                <div className="bg-green-600 text-white text-center py-1 rounded-t-lg -mt-8 -mx-8 mb-4">
+                <div className="bg-primary text-primary-foreground text-center py-1 rounded-t-lg -mt-8 -mx-8 mb-4">
                   Most Popular
                 </div>
               )}
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-2">{plan.name}</h3>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">${plan.price}</span>
-                <span className="text-gray-600">/month</span>
+                <span className="text-4xl font-bold text-foreground">${plan.price}</span>
+                <span className="text-muted-foreground">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, fIdx) => (
                   <li key={fIdx} className="flex items-center gap-2">
                     <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span className="text-gray-600">{feature}</span>
+                    <span className="text-muted-foreground">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -180,8 +180,8 @@ function LandingPage() {
                 to="/signup"
                 className={`w-full py-3 rounded-lg font-semibold transition-colors block text-center ${
                   plan.popular
-                    ? "bg-green-600 text-white hover:bg-green-700"
-                    : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                    ? "bg-primary text-primary-foreground hover:bg-green-700"
+                    : "bg-secondary text-secondary-foreground hover:bg-green-100"
                 }`}
               >
                 Get Started
@@ -193,14 +193,14 @@ function LandingPage() {
 
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-20">
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-12 text-center text-white">
+        <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-12 text-center text-primary-foreground">
           <h2 className="text-4xl font-bold mb-4">Ready to Get Paid Faster?</h2>
           <p className="text-xl mb-8 opacity-90">
             Join thousands of businesses streamlining their invoicing process
           </p>
           <Link
             to="/signup"
-            className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex"
+            className="bg-card text-primary px-8 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors inline-flex"
           >
             Start Free Trial
           </Link>

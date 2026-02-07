@@ -132,25 +132,43 @@ export type RedisClient = ReturnType<typeof createRedisClient>;
 
 /**
  * Cache helper: Get or fetch and cache
+ * Fails open — if Redis is unreachable, executes the fetcher directly.
  */
 export async function getOrCache<T>(
   key: string,
   fetcher: () => Promise<T>,
   ttlSeconds: number = 3600, // 1 hour default
 ): Promise<T> {
-  const cached = await redis.get<T>(key);
-  if (cached !== null) {
-    return cached;
+  try {
+    const cached = await redis.get<T>(key);
+    if (cached !== null) {
+      return cached;
+    }
+  } catch (e) {
+    // Redis unavailable — skip cache read, fall through to fetcher
+    console.warn(`[cache] Redis get failed for key "${key}":`, (e as Error).message);
   }
 
   const value = await fetcher();
-  await redis.set(key, value, ttlSeconds);
+
+  try {
+    await redis.set(key, value, ttlSeconds);
+  } catch (e) {
+    // Redis unavailable — skip cache write, value is still returned
+    console.warn(`[cache] Redis set failed for key "${key}":`, (e as Error).message);
+  }
+
   return value;
 }
 
 /**
  * Cache helper: Invalidate cache
+ * Fails open — if Redis is unreachable, silently ignores the error.
  */
 export async function invalidateCache(key: string): Promise<void> {
-  await redis.delete(key);
+  try {
+    await redis.delete(key);
+  } catch (e) {
+    console.warn(`[cache] Redis delete failed for key "${key}":`, (e as Error).message);
+  }
 }

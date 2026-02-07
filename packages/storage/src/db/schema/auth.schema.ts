@@ -4,7 +4,7 @@
  */
 
 import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
-import { createId } from "../../id.js";
+import { createId } from "../../id";
 
 // User table - managed by BetterAuth
 export const user = pgTable("user", {

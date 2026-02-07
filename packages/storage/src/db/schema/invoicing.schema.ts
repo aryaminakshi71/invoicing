@@ -1,5 +1,5 @@
 import { pgTable, uuid, varchar, text, numeric, boolean, timestamp, integer, index } from 'drizzle-orm/pg-core';
-import { user, organization } from './auth.schema.js';
+import { user, organization } from './auth.schema';
 
 /**
  * Invoicing-Specific Schema

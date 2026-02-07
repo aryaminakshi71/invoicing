@@ -1,7 +1,10 @@
-/**
- * Client-side entry point for TanStack Start
- * This file is not used - TanStack Start uses start.tsx instead
- */
+import { StartClient } from '@tanstack/react-start/client'
+import { StrictMode } from 'react'
+import { hydrateRoot } from 'react-dom/client'
 
-// This file is kept for backwards compatibility but is not used
-// The actual client entry is in start.tsx
+hydrateRoot(
+  document,
+  <StrictMode>
+    <StartClient />
+  </StrictMode>,
+)

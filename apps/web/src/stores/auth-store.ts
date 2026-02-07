@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createAuthClient } from "better-auth/react";
+import { organizationClient } from "better-auth/client/plugins";
 
 export interface AuthState {
   user: any | null;
@@ -23,4 +24,5 @@ export const useAuthStore = create<AuthState>((set) => ({
 const baseURL = import.meta.env.VITE_PUBLIC_SITE_URL || "http://localhost:3004";
 export const authClient = createAuthClient({
   baseURL,
+  plugins: [organizationClient()],
 });
