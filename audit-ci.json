@@ -1,0 +1,20 @@
+{
+  "moderate": {
+    "ignore": [],
+    "allowlist": []
+  },
+  "high": {
+    "ignore": [],
+    "allowlist": []
+  },
+  "critical": {
+    "ignore": [],
+    "allowlist": []
+  },
+  "report-type": ["important", "summary"],
+  "output-format": "table",
+  "path-whitelist": [],
+  "show-found": true,
+  "show-not-found": false,
+  "registry": "https://registry.npmjs.org"
+}

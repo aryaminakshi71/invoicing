@@ -1,0 +1,85 @@
+$ bun run test && bun run test:integration && bun run test:e2e
+$ turbo run test
+• turbo 2.7.5
+• Packages in scope: @invoicing/api, @invoicing/auth, @invoicing/core, @invoicing/env, @invoicing/logger, @invoicing/shared, @invoicing/storage, @invoicing/tsconfig, @invoicing/web, @invoicing/workflows
+• Running test in 10 packages
+• Remote caching disabled
+@invoicing/web:test: cache bypass, force executing 751230319d36feb0
+@invoicing/web:test: $ vitest run
+@invoicing/web:test: 
+@invoicing/web:test:  RUN  v2.1.9 /Users/aryaminakshi/Developer/invoicing/apps/web
+@invoicing/web:test: 
+@invoicing/web:test:  ✓ src/__tests__/api.test.ts (2 tests) 3ms
+@invoicing/web:test:  ✓ src/__tests__/utils.test.ts (2 tests) 4ms
+@invoicing/web:test: 
+@invoicing/web:test:  Test Files  2 passed (2)
+@invoicing/web:test:       Tests  4 passed (4)
+@invoicing/web:test:    Start at  14:48:40
+@invoicing/web:test:    Duration  2.01s (transform 74ms, setup 687ms, collect 37ms, tests 7ms, environment 1.52s, prepare 577ms)
+@invoicing/web:test: 
+
+ Tasks:    1 successful, 1 total
+Cached:    0 cached, 1 total
+  Time:    3.016s 
+
+$ turbo run test:integration
+• turbo 2.7.5
+• Packages in scope: @invoicing/api, @invoicing/auth, @invoicing/core, @invoicing/env, @invoicing/logger, @invoicing/shared, @invoicing/storage, @invoicing/tsconfig, @invoicing/web, @invoicing/workflows
+• Running test:integration in 10 packages
+• Remote caching disabled
+
+No tasks were executed as part of this run.
+
+ Tasks:    0 successful, 0 total
+Cached:    0 cached, 0 total
+  Time:    433ms 
+
+$ playwright test
+
+Running 38 tests using 6 workers
+
+  ✓   1 [chromium] › e2e/invoice-flows.spec.ts:44:3 › Invoice Management › should validate required fields in invoice form (2.3s)
+  ✓   6 [chromium] › e2e/invoice-flows.spec.ts:30:3 › Invoice Management › should open create invoice modal (2.4s)
+  ✓   2 [chromium] › e2e/invoice-flows.spec.ts:15:3 › Invoice Management › should display invoice list page (2.4s)
+  ✓   3 [chromium] › e2e/invoice-flows.spec.ts:62:3 › Invoice Management › should fill and submit invoice form (2.5s)
+  ✓   7 [chromium] › e2e/invoice-flows.spec.ts:87:3 › Invoice Management › should filter invoices by status (1.9s)
+  ✓   9 [chromium] › e2e/invoice-flows.spec.ts:116:3 › Invoice Details › should view invoice details (1.9s)
+  ✓   8 [chromium] › e2e/invoice-flows.spec.ts:102:3 › Invoice Management › should search invoices (2.0s)
+  ✓   5 [chromium] › e2e/app.spec.ts:26:3 › INVOICING E2E Tests › should load landing page (4.6s)
+  ✓  10 [chromium] › e2e/invoice-flows.spec.ts:130:3 › Invoice Details › should download invoice PDF (2.1s)
+  ✓  11 [chromium] › e2e/invoice-flows.spec.ts:150:3 › Payment Flow › should navigate to payments page (1.6s)
+  ✓  13 [chromium] › e2e/invoice-flows.spec.ts:175:3 › Customer Portal › should access customer portal (1.4s)
+  ✓  15 [chromium] › e2e/invoice-flows.spec.ts:200:3 › Reports › should navigate to reports page (1.5s)
+  ✓   4 [chromium] › e2e/app.spec.ts:32:3 › INVOICING E2E Tests › should have no console errors (7.2s)
+  ✓  17 [chromium] › e2e/invoice-flows.spec.ts:225:3 › Recurring Invoices › should navigate to recurring invoices page (1.7s)
+  ✓  12 [chromium] › e2e/invoice-flows.spec.ts:156:3 › Payment Flow › should display payment methods (3.9s)
+  ✓  14 [chromium] › e2e/invoice-flows.spec.ts:181:3 › Customer Portal › should display invoice to customer (4.8s)
+  ✓  21 [chromium] › e2e/invoice-flows.spec.ts:288:3 › Error Handling › should handle 404 gracefully (1.5s)
+  ✓  22 [chromium] › e2e/invoice-flows.spec.ts:304:3 › Error Handling › should handle network errors (922ms)
+  ✓  16 [chromium] › e2e/invoice-flows.spec.ts:206:3 › Reports › should display report options (4.8s)
+  ✓  18 [chromium] › e2e/invoice-flows.spec.ts:231:3 › Recurring Invoices › should display recurring invoice list (4.9s)
+  ✓  19 [chromium] › e2e/invoice-flows.spec.ts:250:3 › Responsive Design › should work on mobile viewport (4.1s)
+  ✓  20 [chromium] › e2e/invoice-flows.spec.ts:268:3 › Responsive Design › should work on tablet viewport (4.0s)
+  ✓  23 [chromium] › e2e/invoice-flows.spec.ts:319:3 › Accessibility › should have no critical accessibility violations (3.2s)
+  ✓  24 [chromium] › e2e/invoice-flows.spec.ts:339:3 › Accessibility › should support keyboard navigation (3.6s)
+  ✓  25 [chromium] › e2e/invoicing.spec.ts:33:5 › Invoicing E2E Tests › Landing Page & Demo Flow › homepage loads (3.7s)
+  ✓  27 [chromium] › e2e/invoicing.spec.ts:76:5 › Invoicing E2E Tests › Landing Page & Demo Flow › should navigate to demo page and launch demo (4.1s)
+  ✓  26 [chromium] › e2e/invoicing.spec.ts:48:5 › Invoicing E2E Tests › Landing Page & Demo Flow › should load landing page without errors (5.8s)
+  ✓  30 [chromium] › e2e/invoicing.spec.ts:232:5 › Invoicing E2E Tests › Page Functionality › dashboard page should load (4.6s)
+  ✓  31 [chromium] › e2e/invoicing.spec.ts:247:5 › Invoicing E2E Tests › Page Functionality › invoices page should load (4.4s)
+  ✓  28 [chromium] › e2e/invoicing.spec.ts:115:5 › Invoicing E2E Tests › Sign In Flow › should display login page correctly (7.3s)
+  ✓  32 [chromium] › e2e/invoicing.spec.ts:259:5 › Invoicing E2E Tests › Page Functionality › apps page should load (4.5s)
+  ✓  33 [chromium] › e2e/invoicing.spec.ts:271:5 › Invoicing E2E Tests › Dashboard Sub-Pages › analytics page should load (4.6s)
+  ✓  34 [chromium] › e2e/invoicing.spec.ts:284:5 › Invoicing E2E Tests › Dashboard Sub-Pages › settings page should load (4.3s)
+  ✓  29 [chromium] › e2e/invoicing.spec.ts:171:5 › Invoicing E2E Tests › Navigation & Links › should navigate to main pages from sidebar (10.5s)
+  ✓  36 [chromium] › e2e/invoicing.spec.ts:317:5 › Invoicing E2E Tests › Additional Tests › should have security headers (4.5s)
+  ✓  35 [chromium] › e2e/invoicing.spec.ts:299:5 › Invoicing E2E Tests › Additional Tests › should show pricing (4.7s)
+  ✓  37 [chromium] › e2e/invoicing.spec.ts:329:5 › Invoicing E2E Tests › Additional Tests › should load within 3 seconds (3.8s)
+  ✓  38 [chromium] › e2e/link-crawl.spec.ts:39:1 › crawl internal links (9.0s)
+
+  38 passed (34.7s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

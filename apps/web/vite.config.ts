@@ -8,6 +8,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { visualizer } from "rollup-plugin-visualizer";
 import path from "path";
 import { fileURLToPath } from "url";
+import { securityHeadersPlugin } from "./src/vite-security-headers-plugin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -61,6 +62,7 @@ export default defineConfig(({ mode }) => {
       viteTsConfigPaths({
         projects: ["./tsconfig.json"],
       }),
+      securityHeadersPlugin(),
       ...(process.env.SKIP_CLOUDFLARE !== 'true' ? [
         cloudflare({
           viteEnvironment: { name: 'ssr' },

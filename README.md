@@ -114,22 +114,113 @@ See `.env.example` for required environment variables.
 
 **Note:** The app supports demo mode via `x-demo-mode` header for testing purposes. Demo mode uses a placeholder token (`demo-token`) that should not be used in production.
 
+## 📖 Documentation
+
+- **[Development Guide](DEVELOPMENT.md)** - Setup, commands, architecture, and best practices
+- **[API Documentation](docs/API.md)** - Complete API reference with examples
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Deploy to Cloudflare, Vercel, Docker, or AWS
+- **[Security Policy](SECURITY.md)** - Security guidelines and vulnerability reporting
+- **[Changelog](CHANGELOG.md)** - Version history and roadmap
+
+## 🔒 Security
+
+We take security seriously. Please review our [Security Policy](SECURITY.md) for:
+- Reporting vulnerabilities
+- Security best practices
+- Compliance information
+
+**Security Features:**
+- ✅ Comprehensive security headers
+- ✅ Input validation and sanitization
+- ✅ SQL injection protection (Drizzle ORM)
+- ✅ XSS protection
+- ✅ CSRF protection (Better Auth)
+- ✅ Rate limiting
+- ✅ Automated security scanning
+- ✅ Environment variable validation
+
+## 🧪 Testing
+
+```bash
+# Unit tests
+bun run test
+
+# E2E tests
+bun run test:e2e
+
+# All tests
+bun run test:all
+
+# Test coverage
+bun run test:coverage
+```
+
+**Test Coverage:**
+- ✅ 38/38 E2E tests passing
+- ✅ 4/4 Unit tests passing
+- 🎯 Target: 80%+ code coverage
+
+## 🚀 Performance
+
+**Optimizations Implemented:**
+- Code splitting for heavy components
+- Database indexes for frequent queries
+- Redis caching for API responses
+- CDN for static assets (Cloudflare)
+- Image lazy loading
+- Bundle size monitoring
+
+## ♿ Accessibility
+
+**WCAG AA Compliant:**
+- Keyboard navigation support
+- Screen reader friendly
+- Focus management
+- ARIA labels
+- Color contrast compliance
+
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'feat: add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a pull request
+
+**Before submitting:**
+- Run tests: `bun run test:all`
+- Run linting: `bun run lint`
+- Format code: `bun run format`
+
+See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed contribution guidelines.
 
 ## 📄 License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
 
-- [GitHub Repository](https://github.com/aryaminakshi71/invoicing)
-- [Documentation](https://github.com/aryaminakshi71/invoicing/wiki)
+- **[GitHub Repository](https://github.com/aryaminakshi71/invoicing)**
+- **[Documentation](https://github.com/aryaminakshi71/invoicing/wiki)**
+- **[Issue Tracker](https://github.com/aryaminakshi71/invoicing/issues)**
+- **[Discussions](https://github.com/aryaminakshi71/invoicing/discussions)**
 
 ## 👤 Author
 
-Arya Labs
+**Arya Labs**
+
+## 🙏 Acknowledgments
+
+Built with amazing open source technologies:
+- [Hono](https://hono.dev/) - Lightweight web framework
+- [TanStack Router](https://tanstack.com/router) - Type-safe routing
+- [Drizzle ORM](https://orm.drizzle.team/) - TypeScript ORM
+- [Better Auth](https://www.better-auth.com/) - Authentication
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Cloudflare](https://cloudflare.com/) - Edge computing platform
 
 ---
 

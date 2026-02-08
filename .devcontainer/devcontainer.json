@@ -1,0 +1,58 @@
+{
+  "name": "Invoicing Platform",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "biomejs.biome",
+        "bradlc.vscode-tailwindcss",
+        "ms-playwright.playwright",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "usernamehw.errorlens",
+        "eamodio.gitlens",
+        "oven.bun-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  
+  "forwardPorts": [3000, 3004, 3013, 5432, 6379],
+  "portsAttributes": {
+    "3000": {
+      "label": "Web App",
+      "onAutoForward": "notify"
+    },
+    "3004": {
+      "label": "Web Dev Server",
+      "onAutoForward": "notify"
+    },
+    "3013": {
+      "label": "API Server",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL"
+    },
+    "6379": {
+      "label": "Redis"
+    }
+  },
+  
+  "postCreateCommand": "bun install",
+  "postStartCommand": "bun run db:push",
+  
+  "remoteUser": "node"
+}

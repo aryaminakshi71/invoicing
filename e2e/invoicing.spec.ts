@@ -318,8 +318,12 @@ test.describe('Invoicing E2E Tests', () => {
       const baseURL = getBaseURL(testInfo);
       const response = await page.goto(baseURL);
       const headers = response?.headers() || {};
-      expect(headers['x-frame-options']).toBeTruthy();
-      expect(headers['x-content-type-options']).toBe('nosniff');
+      
+      // Headers are returned in lowercase by Playwright
+      expect(headers['x-frame-options'] || headers['X-Frame-Options']).toBeTruthy();
+      expect(headers['x-content-type-options'] || headers['X-Content-Type-Options']).toBe('nosniff');
+      expect(headers['x-xss-protection'] || headers['X-XSS-Protection']).toBeTruthy();
+      expect(headers['referrer-policy'] || headers['Referrer-Policy']).toBeTruthy();
     });
 
     test('should load within 3 seconds', async ({ page }, testInfo) => {
